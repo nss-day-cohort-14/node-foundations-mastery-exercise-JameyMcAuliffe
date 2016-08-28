@@ -13,18 +13,23 @@ const readStream = createReadStream('/usr/share/dict/words')
 //pipes to split, then map for filtering
 readStream.pipe(es.split())
 .pipe(es.map(function(data, cb) {
-	if(data.toString().toUpperCase().startsWith(cliArg[0].toUpperCase())) {
-		//console.log(data.toString())
-
-		//cb sends data down the stream
-		cb(null, data)
-	} else{
-		//if not a match, empty callback drops the data
-		cb()
+	if (cliArg[0] === undefined){
+		console.log('Usage: node word-search.js [searchterm]')
+		readStream.emit('end')
+	} 
+	else {
+		if(data.toString().toUpperCase().startsWith(cliArg[0].toUpperCase())) {
+			//cb sends data down the stream
+			cb(null, data)
+		} else{
+			//if not a match, empty callback drops the data
+			cb()
+		}
 	}
 }))
-//data from map cb function being sent to transform
+//data from map cb function being sent to transform,
 .pipe(transform)
+//then back from transform to stdout
 .pipe(process.stdout)
 
 
