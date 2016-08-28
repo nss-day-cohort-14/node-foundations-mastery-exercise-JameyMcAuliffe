@@ -1,13 +1,22 @@
 "use strict";
 
-const { Transform, Readable } = require('stream')
+const { Transform } = require('stream')
 
-const readStream = Readable()
-const transformStream = Transform()
+let counter = 0
 
-let i = 0
+const transformStream = Transform({
+	transform (buff, _, cb) {	
+		//limits results to first 10
+		if (counter < 10) {
 
+			//callback sending the filtered words down the pipe
+			cb(null, `${buff.toString()} \n`)
+			counter++
+		}
+		else {
+			cb()
+		}	
+	}
+})
 
-// transformStream._transform = (buffer, encoding, cb) => {
-// 	cb(null, readStream.pipe(process.stdout))
-// }
+module.exports = transformStream
